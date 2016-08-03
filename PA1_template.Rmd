@@ -7,16 +7,50 @@ output:
 
 
 ## Loading and preprocessing the data
+```{R loadAndProcessData}
+library(ggplot2)
+library(plyr)
+library(reshape2)
+library(xtable)
+setwd("C:/DataScience/Reproducible Research/W2 Project/RepData_PeerAssessment1/");
 
+activityFile <- "activity.zip"
+activityData <- read.csv(unz(activityFile, "activity.csv"), na.strings = "NA")
+
+```
 
 
 ## What is mean total number of steps taken per day?
 
+### histogram of the steps 
+```{r plot,results="asis"}
+steps <- tapply(activityData$steps, activityData$date, FUN = sum, na.rm = TRUE)
+qplot(steps, binwidth = 1000, xlab = "total number of steps taken each day") 
+```
 
+### Table of the steps per date
+```{r results="asis"}
+stepsperDay <-aggregate(steps ~ date, data=activityData, sum, na.action = na.omit)
+colnames(stepsperDay) <-c("date","mean steps")
+
+print(xtable(stepsperDay),type="html")
+
+```
+
+### Mean Steps per date
+```{r results="asis"}
+mean(stepsperDay$`mean steps`)
+```
 
 ## What is the average daily activity pattern?
+### Average Activity per day
+```{r results="asis"}
+ave<- aggregate(x = list(steps = activityData$steps), by = list(interval = activityData$interval), 
+    FUN = mean, na.rm = TRUE)
+ggplot(data = ave, aes(x = interval, y = steps)) + geom_line() + xlab("5-minute intervals") + 
+    ylab("average number of steps taken")
 
-
+```
 
 ## Imputing missing values
 
