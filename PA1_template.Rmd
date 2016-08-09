@@ -17,6 +17,8 @@ setwd("C:/DataScience/Reproducible Research/W2 Project/RepData_PeerAssessment1/"
 activityFile <- "activity.zip"
 activityData <- read.csv(unz(activityFile, "activity.csv"), na.strings = "NA")
 
+#fixed date type, only realized this error later.
+activityData$date <- as.Date(as.character(activityData$date))
 ```
 
 
@@ -28,18 +30,19 @@ steps <- tapply(activityData$steps, activityData$date, FUN = sum, na.rm = TRUE)
 qplot(steps, binwidth = 1000, xlab = "total number of steps taken each day") 
 ```
 
-### Table of the steps per date
+### Mean Steps per date
 ```{r results="asis"}
 stepsperDay <-aggregate(steps ~ date, data=activityData, sum, na.action = na.omit)
 colnames(stepsperDay) <-c("date","mean steps")
 
-print(xtable(stepsperDay),type="html")
-
+mean(stepsperDay$`mean steps`)
 ```
 
-### Mean Steps per date
-```{r results="asis"}
-mean(stepsperDay$`mean steps`)
+### Table of the steps per date
+
+```{r }
+print(xtable(stepsperDay),type="html")
+
 ```
 
 ## What is the average daily activity pattern?
@@ -52,8 +55,44 @@ ggplot(data = ave, aes(x = interval, y = steps)) + geom_line() + xlab("5-minute 
 
 ```
 
+### The average daily Activity is 206.1698
+```{r}
+ave[which.max(ave$steps ),]
+```
+
 ## Imputing missing values
 
+###There are quite a few missing=NA values. We need to replace those missing values with the mean steps in the associate interval. I am using the mean imputing method reference here [https://en.wikipedia.org/wiki/Imputation_(statistics)]
 
+```{r }
+missingSteps<-is.na(activityData$steps)
+
+table(missingSteps)
+```
+
+
+```{r imputingUsingMean}
+
+fill_value <- function(steps, interval) {
+    filled <- NA
+    if (!is.na(steps))
+        filled <- c(steps)
+    else
+        filled <- (ave[ave$interval==interval, "steps"])
+    return(filled)
+}
+
+activityFilled <- activityData
+activityFilled$steps <- mapply(fill_value, activityFilled$steps, activityFilled$interval)
+
+```
+
+###Lets plot this filled dataset
+
+```{r}
+
+totalNumSteps <- tapply(activityFilled$steps, activityFilled$date,FUN=sum)
+qplot(totalNumSteps, binwidth = 1000, xlab = "Total number of steps per each day")
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
