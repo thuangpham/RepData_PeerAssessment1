@@ -86,7 +86,21 @@ activityFilled$steps <- mapply(fill_value, activityFilled$steps, activityFilled$
 ```{r}
 
 totalNumSteps <- tapply(activityFilled$steps, activityFilled$date,FUN=sum)
-qplot(totalNumSteps, binwidth = 1000, xlab = "Total number of steps per each day")
+qplot(totalNumSteps, binwidth = 1000, xlab = "Total number of steps per day")
 ```
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+###Seperate the data between weekend and weekday
+```{r }
+dayofWeek <- ifelse(weekdays(activityFilled$date)=="Saturday" | weekdays(activityFilled$date)=="Sunday","weekend","weekday")
+activityFilled$day <- as.factor(dayofWeek)
+
+weekdayActivities<- subset(activityFilled,day == "weekday")
+wdActivity <- ddply(weekdayActivities, c("interval","day"), summarise, avgSteps=mean(steps))
+
+weekendActivities<- subset(activityFilled,day == "weekend")
+
+weActivity <- ddply(weekendActivities, c("interval","day"), summarise, avgSteps=mean(steps))
+
+```
