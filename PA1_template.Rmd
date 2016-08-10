@@ -36,12 +36,6 @@ stepsperDay <-aggregate(steps ~ date, data=activityData, sum, na.action = na.omi
 colnames(stepsperDay) <-c("date","mean steps")
 
 mean(stepsperDay$`mean steps`)
-```
-
-### Table of the steps per date
-
-```{r }
-print(xtable(stepsperDay),type="html")
 
 ```
 
