@@ -104,3 +104,9 @@ weekendActivities<- subset(activityFilled,day == "weekend")
 weActivity <- ddply(weekendActivities, c("interval","day"), summarise, avgSteps=mean(steps))
 
 ```
+### Weekday vs Weekend Plot
+```{r}
+plot(wdActivity$interval, wdActivity$avgSteps,type = "h", col = "red", pch=16, lwd = 1, main="Week day vs Weekend - Average Steps in 24 Hours at 5-Min interval",xlab="24 Hours at 5-Min interval", ylab="Number of Steps" )
+
+lines(weActivity$interval, weActivity$avgSteps,type = "h", col = "blue", lwd = 1)
+```
